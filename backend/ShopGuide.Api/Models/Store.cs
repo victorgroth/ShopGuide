@@ -7,5 +7,8 @@ namespace ShopGuide.Api.Models
         public string Address { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string StoreType { get; set; } = string.Empty; // ex: "Grocery", "Hardware"
+
+        public ICollection<StoreMapNode> MapNodes { get; set; } = new List<StoreMapNode>(); // En butik har många noder.
+        public ICollection<StoreMapEdge> MapEdges { get; set; } = new List<StoreMapEdge>();
     }
 }
