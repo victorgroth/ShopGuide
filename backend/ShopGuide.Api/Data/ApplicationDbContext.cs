@@ -16,6 +16,9 @@ namespace ShopGuide.Api.Data
         public DbSet<StoreMapEdge> StoreMapEdges => Set<StoreMapEdge>();
         public DbSet<ProductLocation> ProductLocations => Set<ProductLocation>();
         public DbSet<Inventory> Inventories => Set<Inventory>();
+        public DbSet<ShoppingList> ShoppingLists => Set<ShoppingList>();
+        public DbSet<ShoppingListItem> ShoppingListItems => Set<ShoppingListItem>();
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,6 +70,24 @@ namespace ShopGuide.Api.Data
             modelBuilder.Entity<Inventory>()
                 .HasIndex(i => new { i.StoreId, i.ProductId })
                 .IsUnique();
+
+            modelBuilder.Entity<ShoppingList>()
+                .HasOne(sl => sl.Store)
+                .WithMany(s => s.ShoppingLists)
+                .HasForeignKey(sl => sl.StoreId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ShoppingListItem>()
+                .HasOne(i => i.Product)
+                .WithMany()
+                .HasForeignKey(i => i.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ShoppingListItem>()
+                .HasOne(i => i.Node)
+                .WithMany()
+                .HasForeignKey(i => i.NodeId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

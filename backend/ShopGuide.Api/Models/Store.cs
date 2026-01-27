@@ -12,5 +12,6 @@ namespace ShopGuide.Api.Models
         public ICollection<StoreMapEdge> MapEdges { get; set; } = new List<StoreMapEdge>();
         public ICollection<ProductLocation> ProductLocations { get; set; } = new List<ProductLocation>();
         public ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+        public ICollection<ShoppingList> ShoppingLists { get; set; } = new List<ShoppingList>();
     }
 }
