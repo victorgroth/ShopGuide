@@ -10,5 +10,7 @@ namespace ShopGuide.Api.Models
 
         public ICollection<StoreMapNode> MapNodes { get; set; } = new List<StoreMapNode>(); // En butik har många noder.
         public ICollection<StoreMapEdge> MapEdges { get; set; } = new List<StoreMapEdge>();
+        public ICollection<ProductLocation> ProductLocations { get; set; } = new List<ProductLocation>();
+        public ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
     }
 }

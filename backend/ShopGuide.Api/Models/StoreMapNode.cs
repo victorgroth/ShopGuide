@@ -18,6 +18,6 @@ namespace ShopGuide.Api.Models
 
         public ICollection<StoreMapEdge> EdgesFrom { get; set; } = new List<StoreMapEdge>();
         public ICollection<StoreMapEdge> EdgesTo { get; set; } = new List<StoreMapEdge>();
-
+        public ICollection<ProductLocation> ProductLocations { get; set; } = new List<ProductLocation>();
     }
 }
