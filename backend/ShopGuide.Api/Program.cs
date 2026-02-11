@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Data;
+using ShopGuide.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<RoutePlannerService>();
+
 
 var app = builder.Build();
 

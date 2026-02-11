@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Data;
 using ShopGuide.Api.DTOs;
 using ShopGuide.Api.Models;
+using ShopGuide.Api.Services;
+
 
 namespace ShopGuide.Api.Controllers
 {
@@ -11,10 +13,12 @@ namespace ShopGuide.Api.Controllers
     public class ShoppingListsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoutePlannerService _routePlanner;
 
-        public ShoppingListsController(ApplicationDbContext context)
+        public ShoppingListsController(ApplicationDbContext context, RoutePlannerService routePlanner)
         {
             _context = context;
+            _routePlanner = routePlanner;
         }
 
         // POST: api/shoppinglists
@@ -147,6 +151,15 @@ namespace ShopGuide.Api.Controllers
                 OrderIndex = item.OrderIndex
             };
             return Ok(dto);
+        }
+
+        [HttpPost ("{id:int}/plan-route")]
+        public async Task<ActionResult> PlanRoute(int id)
+        {
+            //Planerar och sparar OrderIndex
+            await _routePlanner.PlaneRouteAsync(id);
+
+            return Ok(new {message = "Route planned", shoppingListId = id });
         }
     }
 }
