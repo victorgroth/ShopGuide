@@ -157,7 +157,7 @@ namespace ShopGuide.Api.Controllers
         public async Task<ActionResult> PlanRoute(int id)
         {
             //Planerar och sparar OrderIndex
-            await _routePlanner.PlaneRouteAsync(id);
+            await _routePlanner.PlanRouteAsync(id);
 
             return Ok(new {message = "Route planned", shoppingListId = id });
         }

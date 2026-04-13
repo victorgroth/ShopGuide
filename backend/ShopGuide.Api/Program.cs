@@ -4,6 +4,7 @@ using ShopGuide.Api.Data;
 using ShopGuide.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://0.0.0.0:5187");
 
 // Add services to the container.
 

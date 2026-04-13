@@ -21,7 +21,7 @@ namespace ShopGuide.Api.Services
         /// 4) Greedy: gå alltid till närmaste nod
         /// 5) Sätta OrderIndex på ShoppingListItems
         /// <summary>
-        public async Task PlaneRouteAsync(int shoppingListId)
+        public async Task PlanRouteAsync(int shoppingListId)
         {
             var list = await _context.ShoppingLists.FirstOrDefaultAsync(x => x.Id == shoppingListId);
             if (list == null)
