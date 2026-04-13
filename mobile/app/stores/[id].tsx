@@ -1,8 +1,9 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 import ProductCard from "../../src/components/ProductCard";
 import { Product } from "../../src/types/product";
+
 
 type ShoppingListItem = Product & {
   addedQuantity: number;
@@ -81,18 +82,36 @@ export default function StoreDetailsPage() {
   }
 
   function handlePlanRoute() {
-    const sorted = [...shoppingList].sort((a, b) => {
-      const aisleA = a.aisle ?? "";
-      const aisleB = b.aisle ?? "";
+  const sorted = [...shoppingList].sort((a, b) => {
+    const aisleA = a.aisle ?? "";
+    const aisleB = b.aisle ?? "";
 
-      if (aisleA < aisleB) return -1;
-      if (aisleA > aisleB) return 1;
+    if (aisleA < aisleB) return -1;
+    if (aisleA > aisleB) return 1;
 
-      return a.name.localeCompare(b.name);
-    });
+    return a.name.localeCompare(b.name);
+  });
 
-    setPlannedRoute(sorted);
-  }
+  setPlannedRoute(sorted);
+
+  const routeSteps = sorted.map((item, index) => ({
+    orderIndex: index + 1,
+    productId: item.id,
+    productName: item.name,
+    quantity: item.addedQuantity,
+    aisle: item.aisle,
+    shelf: item.shelf,
+  }));
+
+  router.push({
+    pathname: "/route/[storeId]",
+    params: {
+      storeId: id?.toString() ?? "",
+      storeName: name?.toString() ?? "Butik",
+      steps: JSON.stringify(routeSteps),
+    },
+  });
+}
 
   return (
     <SafeAreaView style={{ flex: 1, padding: 16 }}>
