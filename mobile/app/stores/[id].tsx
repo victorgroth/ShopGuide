@@ -1,9 +1,9 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 import ProductCard from "../../src/components/ProductCard";
+import { getProductsForStore } from "../../src/api/products";
 import { Product } from "../../src/types/product";
-
 
 type ShoppingListItem = Product & {
   addedQuantity: number;
@@ -12,49 +12,35 @@ type ShoppingListItem = Product & {
 export default function StoreDetailsPage() {
   const { id, name } = useLocalSearchParams();
 
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Mjölk 1L",
-      brand: "Arla",
-      category: "Mejeri",
-      price: 16.9,
-      quantity: 50,
-      aisle: "Gång 2",
-      shelf: "Kyldisk",
-    },
-    {
-      id: 2,
-      name: "FormFranska",
-      brand: "Pågen",
-      category: "Bröd",
-      price: 24.9,
-      quantity: 30,
-      aisle: "Gång 1",
-      shelf: "Brödhylla",
-    },
-    {
-      id: 3,
-      name: "Kaffe 450g",
-      brand: "Zoegas",
-      category: "Dryck",
-      price: 54.9,
-      quantity: 18,
-      aisle: "Gång 1",
-      shelf: "Kaffe/Te",
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [plannedRoute, setPlannedRoute] = useState<ShoppingListItem[]>([]);
 
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const data = await getProductsForStore(id?.toString() ?? "");
+        setProducts(data);
+      } catch (err: any) {
+        setError(err.message ?? "Kunde inte hämta produkter");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, [id]);
+
   function handleAddToShoppingList(product: Product) {
     setShoppingList((prev) => {
-      const existingItem = prev.find((item) => item.id === product.id);
+      const existingItem = prev.find((item) => item.productId === product.productId);
 
       if (existingItem) {
         return prev.map((item) =>
-          item.id === product.id
+          item.productId === product.productId
             ? { ...item, addedQuantity: item.addedQuantity + 1 }
             : item
         );
@@ -63,7 +49,6 @@ export default function StoreDetailsPage() {
       return [...prev, { ...product, addedQuantity: 1 }];
     });
 
-    // Nollställ tidigare planerad rutt när listan ändras
     setPlannedRoute([]);
   }
 
@@ -71,7 +56,7 @@ export default function StoreDetailsPage() {
     setShoppingList((prev) =>
       prev
         .map((item) =>
-          item.id === productId
+          item.productId === productId
             ? { ...item, addedQuantity: item.addedQuantity - 1 }
             : item
         )
@@ -82,42 +67,42 @@ export default function StoreDetailsPage() {
   }
 
   function handlePlanRoute() {
-  const sorted = [...shoppingList].sort((a, b) => {
-    const aisleA = a.aisle ?? "";
-    const aisleB = b.aisle ?? "";
+    const sorted = [...shoppingList].sort((a, b) => {
+      const aisleA = a.aisle ?? "";
+      const aisleB = b.aisle ?? "";
 
-    if (aisleA < aisleB) return -1;
-    if (aisleA > aisleB) return 1;
+      if (aisleA < aisleB) return -1;
+      if (aisleA > aisleB) return 1;
 
-    return a.name.localeCompare(b.name);
-  });
+      return a.name.localeCompare(b.name);
+    });
 
-  setPlannedRoute(sorted);
+    setPlannedRoute(sorted);
 
-  const routeSteps = sorted.map((item, index) => ({
-    orderIndex: index + 1,
-    productId: item.id,
-    productName: item.name,
-    quantity: item.addedQuantity,
-    aisle: item.aisle,
-    shelf: item.shelf,
-  }));
+    const routeSteps = sorted.map((item, index) => ({
+      orderIndex: index + 1,
+      productId: item.productId,
+      productName: item.name,
+      quantity: item.addedQuantity,
+      aisle: item.aisle,
+      shelf: item.shelf,
+    }));
 
-  router.push({
-    pathname: "/route/[storeId]",
-    params: {
-      storeId: id?.toString() ?? "",
-      storeName: name?.toString() ?? "Butik",
-      steps: JSON.stringify(routeSteps),
-    },
-  });
-}
+    router.push({
+      pathname: "/route/[storeId]",
+      params: {
+        storeId: id?.toString() ?? "",
+        storeName: name?.toString() ?? "Butik",
+        steps: JSON.stringify(routeSteps),
+      },
+    });
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, padding: 16 }}>
       <FlatList
         data={products}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.productId.toString()}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -137,6 +122,14 @@ export default function StoreDetailsPage() {
             <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 12 }}>
               Produkter i butiken
             </Text>
+
+            {loading && <ActivityIndicator size="large" style={{ marginBottom: 12 }} />}
+
+            {error && (
+              <Text style={{ color: "red", marginBottom: 12 }}>
+                Fel: {error}
+              </Text>
+            )}
           </View>
         }
         ListFooterComponent={
@@ -151,7 +144,7 @@ export default function StoreDetailsPage() {
               <>
                 {shoppingList.map((item) => (
                   <View
-                    key={item.id}
+                    key={item.productId}
                     style={{
                       padding: 12,
                       borderWidth: 1,
@@ -164,7 +157,7 @@ export default function StoreDetailsPage() {
                     {item.aisle && <Text>Plats: {item.aisle}</Text>}
 
                     <Pressable
-                      onPress={() => handleRemoveFromShoppingList(item.id)}
+                      onPress={() => handleRemoveFromShoppingList(item.productId)}
                       style={{
                         marginTop: 8,
                         backgroundColor: "#b00020",
@@ -207,7 +200,7 @@ export default function StoreDetailsPage() {
 
                 {plannedRoute.map((item, index) => (
                   <View
-                    key={item.id}
+                    key={item.productId}
                     style={{
                       padding: 12,
                       borderWidth: 1,

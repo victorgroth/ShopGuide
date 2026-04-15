@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, SafeAreaView, Text } from "react-native";
 import StoreCard from "../src/components/StoreCard";
+import { getStores } from "../src/api/stores";
 import { Store } from "../src/types/store";
 
 export default function Index() {
@@ -12,12 +13,7 @@ export default function Index() {
   useEffect(() => {
     async function fetchStores() {
       try {
-        const response = await fetch("http://192.168.0.16:5187/api/stores");
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await getStores();
         setStores(data);
       } catch (err: any) {
         setError(err.message ?? "Kunde inte hämta butiker");

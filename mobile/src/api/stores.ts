@@ -1,13 +1,6 @@
 import { apiGet } from "./client";
-
-export type Store = {
-    Id: number;
-    name: string;
-    address: string;
-    city: string;
-    storeType: string;
-};
+import { Store } from "../types/store";
 
 export function getStores() {
-    return apiGet<Store[]>("/api/stores");
+  return apiGet<Store[]>("/api/stores");
 }
