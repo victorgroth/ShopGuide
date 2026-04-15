@@ -1,4 +1,4 @@
-import { apiGet } from "./clients";
+import { apiGet } from "./client";
 
 export type Store = {
     Id: number;
