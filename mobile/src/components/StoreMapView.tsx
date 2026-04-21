@@ -1,182 +1,84 @@
-import { Text, View } from "react-native";
+import { View, Text } from "react-native";
 import { RouteStep } from "../types/route";
+import { StoreMap } from "../api/storeMap";
 
-type StoreMapViewProps = {
+type Props = {
   steps: RouteStep[];
+  map: StoreMap | null;
 };
 
-export default function StoreMapView({ steps }: StoreMapViewProps) {
+export default function StoreMapView({ steps, map }: Props) {
+  if (!map) {
+    return <Text>Laddar karta...</Text>;
+  }
+
   return (
     <View
       style={{
+        height: 300,
         borderWidth: 1,
-        borderRadius: 12,
-        padding: 16,
         marginBottom: 20,
-        minHeight: 260,
-        backgroundColor: "#fafafa",
+        position: "relative",
+        backgroundColor: "#f9fafb",
       }}
     >
-      <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 16 }}>
-        Översiktskarta
-      </Text>
+      {/* 🔹 Rita edges */}
+      {map.edges.map((edge, index) => {
+        const from = map.nodes.find(n => n.id === edge.fromNodeId);
+        const to = map.nodes.find(n => n.id === edge.toNodeId);
 
-      <View
-        style={{
-          flex: 1,
-          position: "relative",
-          minHeight: 180,
-          borderWidth: 1,
-          borderRadius: 10,
-          backgroundColor: "white",
-        }}
-      >
-        {/* Entré */}
-        <View
-          style={{
-            position: "absolute",
-            left: 20,
-            top: 70,
-            alignItems: "center",
-          }}
-        >
+        if (!from || !to) return null;
+
+        return (
           <View
+            key={index}
             style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
-              backgroundColor: "green",
-              marginBottom: 4,
+              position: "absolute",
+              left: from.x,
+              top: from.y,
+              width: Math.abs(to.x - from.x),
+              height: 2,
+              backgroundColor: "#999",
             }}
           />
-          <Text style={{ fontSize: 12 }}>Entré</Text>
-        </View>
+        );
+      })}
 
-        {/* Gång 1 */}
-        <View
-          style={{
-            position: "absolute",
-            left: 110,
-            top: 40,
-            alignItems: "center",
-          }}
-        >
+      {/* 🔹 Rita noder */}
+      {map.nodes.map(node => {
+        const step = steps.find(s => s.nodeId === node.id);
+
+        return (
           <View
+            key={node.id}
             style={{
-              width: 22,
-              height: 22,
-              borderRadius: 11,
-              backgroundColor: "#dbeafe",
-              borderWidth: 1,
-              justifyContent: "center",
+              position: "absolute",
+              left: node.x,
+              top: node.y,
               alignItems: "center",
-              marginBottom: 4,
             }}
           >
-            <Text style={{ fontSize: 10 }}>1</Text>
+            <View
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: step ? "#22c55e" : "#e5e7eb",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {step && (
+                <Text style={{ fontSize: 12, color: "white" }}>
+                  {step.orderIndex}
+                </Text>
+              )}
+            </View>
+
+            <Text style={{ fontSize: 10 }}>{node.label}</Text>
           </View>
-          <Text style={{ fontSize: 12 }}>Gång 1</Text>
-        </View>
-
-        {/* Gång 2 */}
-        <View
-          style={{
-            position: "absolute",
-            left: 110,
-            top: 120,
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 11,
-              backgroundColor: "#dbeafe",
-              borderWidth: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: 4,
-            }}
-          >
-            <Text style={{ fontSize: 10 }}>2</Text>
-          </View>
-          <Text style={{ fontSize: 12 }}>Gång 2</Text>
-        </View>
-
-        {/* Kassa */}
-        <View
-          style={{
-            position: "absolute",
-            right: 20,
-            top: 120,
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
-              backgroundColor: "red",
-              marginBottom: 4,
-            }}
-          />
-          <Text style={{ fontSize: 12 }}>Kassa</Text>
-        </View>
-
-        {/* Linjer / väg */}
-        <View
-          style={{
-            position: "absolute",
-            left: 38,
-            top: 78,
-            width: 72,
-            height: 2,
-            backgroundColor: "#999",
-          }}
-        />
-        <View
-          style={{
-            position: "absolute",
-            left: 121,
-            top: 62,
-            width: 2,
-            height: 58,
-            backgroundColor: "#999",
-          }}
-        />
-        <View
-          style={{
-            position: "absolute",
-            left: 132,
-            top: 130,
-            width: 110,
-            height: 2,
-            backgroundColor: "#999",
-          }}
-        />
-
-        {/* Planerade steg */}
-        <View
-          style={{
-            position: "absolute",
-            left: 150,
-            top: 20,
-            right: 10,
-          }}
-        >
-          <Text style={{ fontSize: 12, fontWeight: "600", marginBottom: 6 }}>
-            Rutt:
-          </Text>
-
-          {steps.map((step) => (
-            <Text key={`${step.productId}-${step.orderIndex}`} style={{ fontSize: 12, marginBottom: 2 }}>
-              {step.orderIndex}. {step.productName}
-            </Text>
-          ))}
-        </View>
-      </View>
+        );
+      })}
     </View>
   );
 }

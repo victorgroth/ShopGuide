@@ -115,14 +115,16 @@ export default function StoreDetailsPage() {
       const updated = await getShoppingList(shoppingList.id);
       setShoppingList(updated);
 
-      const routeSteps = updated.items.map((item, index) => ({
-        orderIndex: item.orderIndex ?? index + 1,
-        productId: item.productId,
-        productName: item.productName,
-        quantity: item.quantity,
-        aisle: item.nodeLabel ?? "",
-        shelf: "",
-      }));
+      const routeSteps = updated.items
+  .sort((a, b) => (a.orderIndex ?? 999) - (b.orderIndex ?? 999))
+  .map((item, index) => ({
+    orderIndex: item.orderIndex ?? index + 1,
+    productId: item.productId,
+    productName: item.productName,
+    quantity: item.quantity,
+    nodeLabel: item.nodeLabel ?? "Okänd plats",
+    nodeId: item.nodeId,
+  }));
 
       router.push({
         pathname: "/route/[storeId]",

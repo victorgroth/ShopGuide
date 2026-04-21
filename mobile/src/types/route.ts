@@ -3,6 +3,6 @@ export type RouteStep = {
   productId: number;
   productName: string;
   quantity: number;
-  aisle?: string;
-  shelf?: string;
+  nodeLabel: string;
+  nodeId?: number; 
 };
