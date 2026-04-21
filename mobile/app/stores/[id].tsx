@@ -1,101 +1,141 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  Text,
+  View,
+} from "react-native";
 import ProductCard from "../../src/components/ProductCard";
 import { getProductsForStore } from "../../src/api/products";
+import {
+  createShoppingList,
+  getShoppingList,
+  addItemToShoppingList,
+  planRoute,
+  ShoppingListDto,
+} from "../../src/api/shoppingLists";
 import { Product } from "../../src/types/product";
-
-type ShoppingListItem = Product & {
-  addedQuantity: number;
-};
 
 export default function StoreDetailsPage() {
   const { id, name } = useLocalSearchParams();
 
+  const rawId = Array.isArray(id) ? id[0] : id;
+  const storeId = Number(rawId);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [productsError, setProductsError] = useState<string | null>(null);
 
-  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
-  const [plannedRoute, setPlannedRoute] = useState<ShoppingListItem[]>([]);
+  const [shoppingList, setShoppingList] = useState<ShoppingListDto | null>(null);
+  const [shoppingListLoading, setShoppingListLoading] = useState(true);
+  const [shoppingListError, setShoppingListError] = useState<string | null>(null);
+
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function loadPage() {
+      if (!rawId || Number.isNaN(storeId)) {
+        setProductsError("Ogiltigt butik-id");
+        setShoppingListError("Ogiltigt butik-id");
+        setLoading(false);
+        setShoppingListLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setShoppingListLoading(true);
+      setProductsError(null);
+      setShoppingListError(null);
+      setRouteError(null);
+
+      console.log("rawId:", rawId);
+      console.log("storeId:", storeId);
+
       try {
-        const data = await getProductsForStore(id?.toString() ?? "");
-        setProducts(data);
+        const productsData = await getProductsForStore(rawId);
+        setProducts(productsData);
       } catch (err: any) {
-        setError(err.message ?? "Kunde inte hämta produkter");
+        console.log("Products load error:", err);
+        setProductsError(err.message ?? "Kunde inte hämta produkter");
       } finally {
         setLoading(false);
       }
+
+      try {
+        console.log("Trying to create shopping list for storeId:", storeId);
+        const shoppingListData = await createShoppingList(storeId);
+        console.log("Created shopping list:", shoppingListData);
+        setShoppingList(shoppingListData);
+      } catch (err: any) {
+        console.log("Shopping list create error:", err);
+        setShoppingListError(err.message ?? "Kunde inte skapa shoppinglista");
+      } finally {
+        setShoppingListLoading(false);
+      }
     }
 
-    fetchProducts();
-  }, [id]);
+    loadPage();
+  }, [rawId, storeId]);
 
-  function handleAddToShoppingList(product: Product) {
-    setShoppingList((prev) => {
-      const existingItem = prev.find((item) => item.productId === product.productId);
+  async function refreshShoppingList() {
+    if (!shoppingList) return;
 
-      if (existingItem) {
-        return prev.map((item) =>
-          item.productId === product.productId
-            ? { ...item, addedQuantity: item.addedQuantity + 1 }
-            : item
-        );
-      }
-
-      return [...prev, { ...product, addedQuantity: 1 }];
-    });
-
-    setPlannedRoute([]);
+    try {
+      const updated = await getShoppingList(shoppingList.id);
+      setShoppingList(updated);
+    } catch (err: any) {
+      console.log("Refresh shopping list error:", err);
+      setShoppingListError(err.message ?? "Kunde inte uppdatera inköpslista");
+    }
   }
 
-  function handleRemoveFromShoppingList(productId: number) {
-    setShoppingList((prev) =>
-      prev
-        .map((item) =>
-          item.productId === productId
-            ? { ...item, addedQuantity: item.addedQuantity - 1 }
-            : item
-        )
-        .filter((item) => item.addedQuantity > 0)
-    );
+  async function handleAddToShoppingList(product: Product) {
+    if (!shoppingList) return;
 
-    setPlannedRoute([]);
+    try {
+      setShoppingListError(null);
+      await addItemToShoppingList(shoppingList.id, product.productId, 1);
+      await refreshShoppingList();
+    } catch (err: any) {
+      console.log("Add item error:", err);
+      setShoppingListError(err.message ?? "Kunde inte lägga till produkt");
+    }
   }
 
-  function handlePlanRoute() {
-    const sorted = [...shoppingList].sort((a, b) => {
-      const aisleA = a.aisle ?? "";
-      const aisleB = b.aisle ?? "";
+  async function handlePlanRoute() {
+    if (!shoppingList) return;
 
-      if (aisleA < aisleB) return -1;
-      if (aisleA > aisleB) return 1;
+    try {
+      setRouteError(null);
 
-      return a.name.localeCompare(b.name);
-    });
+      await planRoute(shoppingList.id);
+      const updated = await getShoppingList(shoppingList.id);
+      setShoppingList(updated);
 
-    setPlannedRoute(sorted);
+      const routeSteps = updated.items.map((item, index) => ({
+        orderIndex: item.orderIndex ?? index + 1,
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        aisle: item.nodeLabel ?? "",
+        shelf: "",
+      }));
 
-    const routeSteps = sorted.map((item, index) => ({
-      orderIndex: index + 1,
-      productId: item.productId,
-      productName: item.name,
-      quantity: item.addedQuantity,
-      aisle: item.aisle,
-      shelf: item.shelf,
-    }));
-
-    router.push({
-      pathname: "/route/[storeId]",
-      params: {
-        storeId: id?.toString() ?? "",
-        storeName: name?.toString() ?? "Butik",
-        steps: JSON.stringify(routeSteps),
-      },
-    });
+      router.push({
+        pathname: "/route/[storeId]",
+        params: {
+          storeId: storeId.toString(),
+          storeName: name?.toString() ?? "Butik",
+          steps: JSON.stringify(routeSteps),
+        },
+      });
+    } catch (err: any) {
+      console.log("Plan route error:", err);
+      setRouteError(err.message ?? "Kunde inte planera rutt");
+    }
   }
 
   return (
@@ -123,11 +163,13 @@ export default function StoreDetailsPage() {
               Produkter i butiken
             </Text>
 
-            {loading && <ActivityIndicator size="large" style={{ marginBottom: 12 }} />}
+            {loading && (
+              <ActivityIndicator size="large" style={{ marginBottom: 12 }} />
+            )}
 
-            {error && (
+            {productsError && (
               <Text style={{ color: "red", marginBottom: 12 }}>
-                Fel: {error}
+                Fel: {productsError}
               </Text>
             )}
           </View>
@@ -138,13 +180,19 @@ export default function StoreDetailsPage() {
               Min inköpslista
             </Text>
 
-            {shoppingList.length === 0 ? (
+            {shoppingListLoading ? (
+              <ActivityIndicator size="small" />
+            ) : shoppingListError ? (
+              <Text style={{ color: "red", marginBottom: 12 }}>
+                Fel: {shoppingListError}
+              </Text>
+            ) : !shoppingList || shoppingList.items.length === 0 ? (
               <Text>Inga produkter tillagda ännu.</Text>
             ) : (
               <>
-                {shoppingList.map((item) => (
+                {shoppingList.items.map((item) => (
                   <View
-                    key={item.productId}
+                    key={item.id}
                     style={{
                       padding: 12,
                       borderWidth: 1,
@@ -152,25 +200,12 @@ export default function StoreDetailsPage() {
                       marginBottom: 8,
                     }}
                   >
-                    <Text style={{ fontWeight: "600" }}>{item.name}</Text>
-                    <Text>Antal: {item.addedQuantity}</Text>
-                    {item.aisle && <Text>Plats: {item.aisle}</Text>}
-
-                    <Pressable
-                      onPress={() => handleRemoveFromShoppingList(item.productId)}
-                      style={{
-                        marginTop: 8,
-                        backgroundColor: "#b00020",
-                        paddingVertical: 8,
-                        paddingHorizontal: 10,
-                        borderRadius: 8,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ color: "white", fontWeight: "600" }}>
-                        Ta bort en
-                      </Text>
-                    </Pressable>
+                    <Text style={{ fontWeight: "600" }}>{item.productName}</Text>
+                    <Text>Antal: {item.quantity}</Text>
+                    {item.nodeLabel && <Text>Plats: {item.nodeLabel}</Text>}
+                    {item.orderIndex && (
+                      <Text>Ruttordning: {item.orderIndex}</Text>
+                    )}
                   </View>
                 ))}
 
@@ -189,34 +224,13 @@ export default function StoreDetailsPage() {
                     Planera rutt
                   </Text>
                 </Pressable>
+
+                {routeError && (
+                  <Text style={{ color: "red", marginTop: 12 }}>
+                    Fel: {routeError}
+                  </Text>
+                )}
               </>
-            )}
-
-            {plannedRoute.length > 0 && (
-              <View style={{ marginTop: 20 }}>
-                <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>
-                  Planerad rutt
-                </Text>
-
-                {plannedRoute.map((item, index) => (
-                  <View
-                    key={item.productId}
-                    style={{
-                      padding: 12,
-                      borderWidth: 1,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <Text style={{ fontWeight: "700" }}>
-                      {index + 1}. {item.name}
-                    </Text>
-                    <Text>Antal: {item.addedQuantity}</Text>
-                    {item.aisle && <Text>Gå till: {item.aisle}</Text>}
-                    {item.shelf && <Text>Hylla: {item.shelf}</Text>}
-                  </View>
-                ))}
-              </View>
             )}
           </View>
         }

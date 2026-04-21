@@ -9,7 +9,7 @@ using ShopGuide.Api.Services;
 namespace ShopGuide.Api.Controllers
 {
     [ApiController]
-    [Route("api/shoppingList")]
+    [Route("api/shoppinglists")]
     public class ShoppingListsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
