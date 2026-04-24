@@ -4,6 +4,7 @@ import { FlatList, SafeAreaView, Text, View } from "react-native";
 import StoreMapView from "../../src/components/StoreMapView";
 import { getStoreMap, StoreMap } from "../../src/api/storeMap";
 import { RouteStep } from "../../src/types/route";
+import { getStoreMapImage } from "../../src/utils/storeMapImage";
 
 export default function RoutePage() {
   const params = useLocalSearchParams();
@@ -17,6 +18,7 @@ export default function RoutePage() {
     ? params.storeName[0]
     : (params.storeName as string) ?? "Butik";
 
+  const mapImage = getStoreMapImage(storeName);
   const [map, setMap] = useState<StoreMap | null>(null);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -30,6 +32,7 @@ export default function RoutePage() {
   }
 
   const sortedSteps = [...steps].sort((a, b) => a.orderIndex - b.orderIndex);
+
 
   useEffect(() => {
     async function loadMap() {
@@ -69,15 +72,27 @@ export default function RoutePage() {
         Antal stopp: {sortedSteps.length}
       </Text>
 
-      {mapLoading ? (
+    {mapLoading ? (
         <Text style={{ marginBottom: 16 }}>Laddar karta...</Text>
-      ) : mapError ? (
+    ) : mapError ? (
         <Text style={{ color: "red", marginBottom: 16 }}>
-          Fel: {mapError}
+            Fel: {mapError}
         </Text>
-      ) : (
-        <StoreMapView steps={sortedSteps} map={map} />
-      )}
+    ) : !mapImage ? (
+        <Text style={{ color: "red", marginBottom: 16 }}>
+            Ingen kartbild hittades för butiken.
+        </Text>
+    ) : !map ? (
+        <Text style={{ color: "red", marginBottom: 16 }}>
+            Ingen kartdata hämtades från backend.
+        </Text>
+    ) : (
+        <StoreMapView
+            steps={sortedSteps}
+            map={map}
+            image={mapImage}
+        />
+        )}
 
       <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>
         Steg-för-steg
