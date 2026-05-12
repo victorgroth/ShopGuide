@@ -1,4 +1,4 @@
-
+//dotnet run --project .\ShopGuide.Api\ShopGuide.Api.csproj --launch-profile http
 using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Data;
 using ShopGuide.Api.Services;

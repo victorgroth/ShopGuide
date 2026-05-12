@@ -13,6 +13,8 @@ export type MapEdge = {
 };
 
 export type StoreMap = {
+  imageWidth: number;
+  imageHeight: number;
   nodes: MapNode[];
   edges: MapEdge[];
 };

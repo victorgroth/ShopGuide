@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { Image, Text, View } from "react-native";
 import Svg, { Circle, Line, Text as SvgText } from "react-native-svg";
-import { RouteStep } from "../types/route";
 import { StoreMap } from "../api/storeMap";
+import { RouteStep } from "../types/route";
 
 type Props = {
   steps: RouteStep[];
@@ -10,82 +10,85 @@ type Props = {
   image: any;
 };
 
-export default function StoreMapView({ steps, map, image }: Props) {
-  if (!map || !image) return null;
+export default function StoreMapView({ map, image }: Props) {
+  if (!map || !image) {
+    return <Text>Ingen karta att visa</Text>;
+  }
 
   const width = 320;
-  const height = 260;
+  const height = 304;
 
-  const getStep = (nodeId: number) =>
-    steps.find((s) => s.nodeId === nodeId);
+  const imageWidth = map.imageWidth || 1536;
+  const imageHeight = map.imageHeight || 1024;
 
-  const routeNodes = steps
-    .map((s) => map.nodes.find((n) => n.id === s.nodeId))
-    .filter(Boolean);
+  const scaleX = (x: number) => (x / imageWidth) * width;
+  const scaleY = (y: number) => (y / imageHeight) * height;
 
   return (
-    <View style={{ marginBottom: 20 }}>
-      {/* 🖼️ Bakgrundsbild */}
+    <View
+      style={{
+        width,
+        height,
+        alignSelf: "center",
+        marginBottom: 20,
+        borderWidth: 1,
+        borderRadius: 12,
+        overflow: "hidden",
+        backgroundColor: "#fff",
+      }}
+    >
       <Image
         source={image}
         style={{
           width,
           height,
           position: "absolute",
-          borderRadius: 12,
         }}
-        resizeMode="contain"
+        resizeMode="stretch"
       />
 
-      {/* 🔷 Overlay SVG */}
       <Svg width={width} height={height}>
-        {/* 🔵 Ruttlinje */}
-        {routeNodes.map((node, i) => {
-          if (!node || i === routeNodes.length - 1) return null;
+        {map.edges.map((edge, index) => {
+          const from = map.nodes.find((n) => n.id === edge.fromNodeId);
+          const to = map.nodes.find((n) => n.id === edge.toNodeId);
 
-          const next = routeNodes[i + 1];
-          if (!next) return null;
+          if (!from || !to) return null;
 
           return (
             <Line
-              key={i}
-              x1={node.x}
-              y1={node.y}
-              x2={next.x}
-              y2={next.y}
+              key={`edge-${index}`}
+              x1={scaleX(from.x)}
+              y1={scaleY(from.y)}
+              x2={scaleX(to.x)}
+              y2={scaleY(to.y)}
               stroke="#2563eb"
-              strokeWidth={4}
+              strokeWidth={2}
+              opacity={0.65}
             />
           );
         })}
 
-        {/* 🟢 Noder */}
-        {map.nodes.map((node) => {
-          const step = getStep(node.id);
+        {map.nodes.map((node) => (
+          <React.Fragment key={node.id}>
+            <Circle
+              cx={scaleX(node.x)}
+              cy={scaleY(node.y)}
+              r={4}
+              fill="#ef4444"
+              stroke="#111827"
+              strokeWidth={1}
+            />
 
-          return (
-            <React.Fragment key={node.id}>
-              <Circle
-                cx={node.x}
-                cy={node.y}
-                r={10}
-                fill={step ? "#22c55e" : "#e5e7eb"}
-              />
-
-              {step && (
-                <SvgText
-                  x={node.x}
-                  y={node.y + 4}
-                  fontSize="10"
-                  fill="#fff"
-                  textAnchor="middle"
-                >
-                  {step.orderIndex}
-                </SvgText>
-              )}
-            </React.Fragment>
-          );
-        })}
+            <SvgText
+              x={scaleX(node.x) + 5}
+              y={scaleY(node.y) + 3}
+              fontSize="7"
+              fill="#111827"
+            >
+              {node.id}
+            </SvgText>
+          </React.Fragment>
+        ))}
       </Svg>
     </View>
   );

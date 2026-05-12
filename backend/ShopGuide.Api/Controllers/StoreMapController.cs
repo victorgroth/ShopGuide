@@ -49,6 +49,8 @@ namespace ShopGuide.Api.Controllers
             var map = new StoreMapDto
             {
                 StoreId = storeId,
+                ImageWidth = 800,
+                ImageHeight = 760,
                 Nodes = nodes,
                 Edges = edges
             };

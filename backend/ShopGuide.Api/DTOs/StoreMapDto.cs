@@ -4,6 +4,9 @@ namespace ShopGuide.Api.DTOs
     {
         public int StoreId { get; set; }
 
+        public int ImageWidth { get; set; }
+        public int ImageHeight { get; set; }
+
         public List<StoreMapNodeDto> Nodes { get; set; } = new();
         public List<StoreMapEdgeDto> Edges { get; set; } = new();
     }
