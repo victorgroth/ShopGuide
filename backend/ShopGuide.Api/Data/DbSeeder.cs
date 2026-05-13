@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Models;
 using ShopGuide.Api.Data.SeedFiles;
-
 namespace ShopGuide.Api.Data
 {
     public static class DbSeeder
@@ -116,6 +115,66 @@ namespace ShopGuide.Api.Data
             await context.SaveChangesAsync();
 
             // =========================
+// LOAD ICA PRODUCTS JSON
+// =========================
+
+var productsJsonPath = Path.Combine(
+    AppContext.BaseDirectory,
+    "Data",
+    "SeedFiles",
+    "ica-products.json"
+);
+
+var productsJson = await File.ReadAllTextAsync(productsJsonPath);
+
+var icaProducts = JsonSerializer.Deserialize<List<SeedProductData>>(
+    productsJson,
+    new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    }
+)!;
+
+foreach (var item in icaProducts)
+{
+    var product = new Product
+    {
+        Name = item.Name,
+        Category = item.Category,
+        Brand = item.Brand
+    };
+
+    context.Products.Add(product);
+    await context.SaveChangesAsync();
+
+    context.Inventories.Add(new Inventory
+    {
+        StoreId = groceryStore.Id,
+        ProductId = product.Id,
+        Price = item.Price,
+        Quantity = item.Quantity
+    });
+
+    if (!nodeLookup.ContainsKey(item.NodeKey))
+    {
+        throw new Exception($"NodeKey {item.NodeKey} not found for product {item.Name}");
+    }
+
+    var node = nodeLookup[item.NodeKey];
+
+    context.ProductLocations.Add(new ProductLocation
+    {
+        StoreId = groceryStore.Id,
+        ProductId = product.Id,
+        NodeId = node.Id,
+        Aisle = item.Aisle,
+        Shelf = item.Shelf
+    });
+}
+
+await context.SaveChangesAsync();
+
+            // =========================
             // BYGGHALLEN NODES
             // =========================
 
@@ -197,148 +256,7 @@ namespace ShopGuide.Api.Data
             AddBidirectionalEdge(hardwareStore, hAisle2, hCheckout, 8);
 
             await context.SaveChangesAsync();
-
-            // =========================
-            // PRODUCTS
-            // =========================
-
-            var milk = new Product
-            {
-                Name = "Mjölk 1L",
-                Category = "Mejeri",
-                Brand = "Arla"
-            };
-
-            var bread = new Product
-            {
-                Name = "FormFranska",
-                Category = "Bröd",
-                Brand = "Pågen"
-            };
-
-            var butter = new Product
-            {
-                Name = "Smör 500g",
-                Category = "Mejeri",
-                Brand = "Arla"
-            };
-
-            var pasta = new Product
-            {
-                Name = "Pasta 500g",
-                Category = "Torrvaror",
-                Brand = "Barilla"
-            };
-
-            var coffee = new Product
-            {
-                Name = "Kaffe 450g",
-                Category = "Dryck",
-                Brand = "Zoegas"
-            };
-
-            context.Products.AddRange(
-                milk,
-                bread,
-                butter,
-                pasta,
-                coffee
-            );
-
-            await context.SaveChangesAsync();
-
-            // =========================
-            // INVENTORY
-            // =========================
-
-            context.Inventories.AddRange(
-                new Inventory
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = milk.Id,
-                    Price = 16.90m,
-                    Quantity = 50
-                },
-                new Inventory
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = bread.Id,
-                    Price = 24.90m,
-                    Quantity = 30
-                },
-                new Inventory
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = butter.Id,
-                    Price = 34.90m,
-                    Quantity = 25
-                },
-                new Inventory
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = pasta.Id,
-                    Price = 19.90m,
-                    Quantity = 60
-                },
-                new Inventory
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = coffee.Id,
-                    Price = 54.90m,
-                    Quantity = 18
-                }
-            );
-
-            await context.SaveChangesAsync();
-
-            // =========================
-            // PRODUCT LOCATIONS
-            // =========================
-
-            context.ProductLocations.AddRange(
-                new ProductLocation
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = milk.Id,
-                    NodeId = nodeLookup["N40"].Id,
-                    Aisle = "Mejeri",
-                    Shelf = "Kyldisk"
-                },
-                new ProductLocation
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = bread.Id,
-                    NodeId = nodeLookup["N39"].Id,
-                    Aisle = "Bageri",
-                    Shelf = "Brödhylla"
-                },
-                new ProductLocation
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = butter.Id,
-                    NodeId = nodeLookup["N40"].Id,
-                    Aisle = "Mejeri",
-                    Shelf = "Mejeri"
-                },
-                new ProductLocation
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = pasta.Id,
-                    NodeId = nodeLookup["N22"].Id,
-                    Aisle = "Pasta",
-                    Shelf = "Torrvaror"
-                },
-                new ProductLocation
-                {
-                    StoreId = groceryStore.Id,
-                    ProductId = coffee.Id,
-                    NodeId = nodeLookup["N13"].Id,
-                    Aisle = "Kaffe/Te",
-                    Shelf = "Dryck"
-                }
-            );
-
-            await context.SaveChangesAsync();
+            
         }
     }
 }

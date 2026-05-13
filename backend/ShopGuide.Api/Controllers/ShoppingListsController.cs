@@ -161,5 +161,24 @@ namespace ShopGuide.Api.Controllers
 
             return Ok(new {message = "Route planned", shoppingListId = id });
         }
+
+        [HttpGet("{id:int}/route-path")]
+public async Task<IActionResult> GetRoutePath(int id)
+{
+    try
+    {
+        var pathNodeIds = await _routePlanner.BuildRoutePathAsync(id);
+
+        return Ok(new
+        {
+            ShoppingListId = id,
+            PathNodeIds = pathNodeIds
+        });
+    }
+    catch (InvalidOperationException ex)
+    {
+        return NotFound(ex.Message);
+    }
+}
     }
 }

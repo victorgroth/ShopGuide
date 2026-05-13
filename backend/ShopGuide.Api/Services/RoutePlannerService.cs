@@ -1,4 +1,3 @@
-using System.Xml;
 using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Data;
 using ShopGuide.Api.Models;
@@ -14,50 +13,39 @@ namespace ShopGuide.Api.Services
             _context = context;
         }
 
-        /// <summary>
-        /// 1) Hitta Entré-nod (NodeType == "Entrance")
-        /// 2) Samla alla unika produkt-noder från listans items
-        /// 3) Använda Dijkstra för avstånd mellan noder
-        /// 4) Greedy: gå alltid till närmaste nod
-        /// 5) Sätta OrderIndex på ShoppingListItems
-        /// <summary>
         public async Task PlanRouteAsync(int shoppingListId)
         {
-            var list = await _context.ShoppingLists.FirstOrDefaultAsync(x => x.Id == shoppingListId);
+            var list = await _context.ShoppingLists
+                .FirstOrDefaultAsync(x => x.Id == shoppingListId);
+
             if (list == null)
                 throw new InvalidOperationException($"ShoppingList {shoppingListId} not found.");
 
-            //Hämta items (spårade items-objekt) så vi kan uppdatera OrderIndex
             var items = await _context.ShoppingListItems
                 .Where(i => i.ShoppingListId == shoppingListId)
                 .ToListAsync();
 
             if (items.Count == 0)
-            return;
+                return;
 
-            //Hämta butikens noder (för att hitta entre/kassa)
             var nodes = await _context.StoreMapNodes
-            .Where(n => n.StoreId == list.StoreId)
-            .ToListAsync();
+                .Where(n => n.StoreId == list.StoreId)
+                .ToListAsync();
 
             if (nodes.Count == 0)
-                throw new InvalidOperationException($"Store {list.StoreId} has no mape nodes");
+                throw new InvalidOperationException($"Store {list.StoreId} has no map nodes.");
 
             var entranceNode = nodes.FirstOrDefault(n => n.NodeType == "Entrance") ?? nodes.First();
-            var checkoutNode = nodes.FirstOrDefault(n => n.NodeType == "Checkout");
 
-            //Skapa adjency list från edges
             var edges = await _context.StoreMapEdges
                 .Where(e => e.StoreId == list.StoreId)
                 .ToListAsync();
 
             var graph = BuildGraph(edges);
 
-            //Ta bort items som faktiskt har en NodeId
             var itemsWithNode = items.Where(i => i.NodeId.HasValue).ToList();
             var itemsWithoutNode = items.Where(i => !i.NodeId.HasValue).ToList();
 
-            //Unika noder som vi behöver besöka
             var targetNodes = itemsWithNode
                 .Select(i => i.NodeId!.Value)
                 .Distinct()
@@ -65,28 +53,23 @@ namespace ShopGuide.Api.Services
 
             if (targetNodes.Count == 0)
             {
-                //Ingen har plats -> lägg bara sist
                 int idx = 1;
-                foreach(var i in itemsWithNode)
-                    i.OrderIndex = idx++;
+
+                foreach (var item in itemsWithoutNode.OrderBy(i => i.ProductId))
+                    item.OrderIndex = idx++;
+
+                await _context.SaveChangesAsync();
                 return;
             }
 
-            //Greedy-ordning mellan noder
-            var routeNodes = BuildGreedyRoute(
+            var routeNodes = BuildZoneBasedRoute(
                 graph,
+                allNodes: nodes,
                 startNodeId: entranceNode.Id,
                 targets: targetNodes
             );
 
-            //Lägg till kassa sist om den finns och om den inte redan är med
-            if (checkoutNode != null && !routeNodes.Contains(checkoutNode.Id))
-                routeNodes.Add(checkoutNode.Id);
-
-            // Sätt OrderIndex på items baserat på nodordningen
-            // Alla items i samma nod får samma "block" (men olika OrderIndex i följd)
             int order = 1;
-
 
             foreach (var nodeId in routeNodes)
             {
@@ -95,77 +78,140 @@ namespace ShopGuide.Api.Services
                     .OrderBy(i => i.ProductId)
                     .ToList();
 
-                foreach (var it in itemsAtNode)
-                    it.OrderIndex = order++;        
+                foreach (var item in itemsAtNode)
+                    item.OrderIndex = order++;
             }
 
-            //items utan nod hamnar sist
-            foreach (var it in itemsWithoutNode.OrderBy(i => i.ProductId))
-                it.OrderIndex = order++;
+            foreach (var item in itemsWithoutNode.OrderBy(i => i.ProductId))
+                item.OrderIndex = order++;
 
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<int>> BuildRoutePathAsync(int shoppingListId)
+        {
+            var list = await _context.ShoppingLists
+                .FirstOrDefaultAsync(x => x.Id == shoppingListId);
+
+            if (list == null)
+                throw new InvalidOperationException($"ShoppingList {shoppingListId} not found.");
+
+            var nodes = await _context.StoreMapNodes
+                .Where(n => n.StoreId == list.StoreId)
+                .ToListAsync();
+
+            if (nodes.Count == 0)
+                throw new InvalidOperationException($"Store {list.StoreId} has no map nodes.");
+
+            var entranceNode = nodes.FirstOrDefault(n => n.NodeType == "Entrance") ?? nodes.First();
+            var checkoutNode = nodes.FirstOrDefault(n => n.NodeType == "Checkout");
+
+            var edges = await _context.StoreMapEdges
+                .Where(e => e.StoreId == list.StoreId)
+                .ToListAsync();
+
+            var graph = BuildGraph(edges);
+
+            var orderedTargetNodeIds = await _context.ShoppingListItems
+                .Where(i => i.ShoppingListId == shoppingListId && i.NodeId.HasValue)
+                .OrderBy(i => i.OrderIndex)
+                .Select(i => i.NodeId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            var fullPath = new List<int>();
+            var currentNodeId = entranceNode.Id;
+
+            foreach (var targetNodeId in orderedTargetNodeIds)
+            {
+                var pathPart = DijkstraPath(graph, currentNodeId, targetNodeId);
+
+                AddPathPart(fullPath, pathPart);
+
+                currentNodeId = targetNodeId;
+            }
+
+            if (checkoutNode != null)
+            {
+                var pathToCheckout = DijkstraPath(graph, currentNodeId, checkoutNode.Id);
+                AddPathPart(fullPath, pathToCheckout);
+            }
+
+            return fullPath;
+        }
+
+        private static void AddPathPart(List<int> fullPath, List<int> pathPart)
+        {
+            if (pathPart.Count == 0)
+                return;
+
+            if (fullPath.Count == 0)
+            {
+                fullPath.AddRange(pathPart);
+                return;
+            }
+
+            fullPath.AddRange(pathPart.Skip(1));
+        }
 
         private static Dictionary<int, List<(int to, double cost)>> BuildGraph(List<StoreMapEdge> edges)
         {
             var graph = new Dictionary<int, List<(int to, double cost)>>();
-            foreach (var e in edges)
-            {
-                if (!graph.ContainsKey(e.FromNodeId))
-                    graph[e.FromNodeId] = new List<(int, double)>();
 
-                graph[e.FromNodeId].Add((e.ToNodeId, e.Distance));
+            foreach (var edge in edges)
+            {
+                if (!graph.ContainsKey(edge.FromNodeId))
+                    graph[edge.FromNodeId] = new List<(int, double)>();
+
+                graph[edge.FromNodeId].Add((edge.ToNodeId, edge.Distance));
             }
+
             return graph;
         }
 
-        private List<int> BuildGreedyRoute(
+        private static List<int> BuildGreedyRoute(
             Dictionary<int, List<(int to, double cost)>> graph,
             int startNodeId,
             HashSet<int> targets)
         {
             var remaining = new HashSet<int>(targets);
             var route = new List<int>();
+            var current = startNodeId;
 
-            int current = startNodeId;
-
-            while(remaining.Count > 0)
+            while (remaining.Count > 0)
             {
-                int bestNode = -1;
-                double bestDistance = double.PositiveInfinity;
+                var bestNode = -1;
+                var bestDistance = double.PositiveInfinity;
 
                 foreach (var candidate in remaining)
                 {
-                    var dist = DijkstraDistance(graph, current, candidate);
+                    var distance = DijkstraDistance(graph, current, candidate);
 
-                    if (dist < bestDistance)
+                    if (distance < bestDistance)
                     {
-                        bestDistance = dist;
+                        bestDistance = distance;
                         bestNode = candidate;
                     }
                 }
 
-                //Om grafen är trasig och ingen väg finns -> ta en "fallback"
                 if (bestNode == -1 || double.IsPositiveInfinity(bestDistance))
-                {
                     bestNode = remaining.First();
-                }
 
                 route.Add(bestNode);
                 remaining.Remove(bestNode);
                 current = bestNode;
             }
+
             return route;
         }
 
-        //Returnerar korstaste avståndet mellan två noder med Dijkstra.
         private static double DijkstraDistance(
             Dictionary<int, List<(int to, double cost)>> graph,
             int start,
             int goal)
         {
-            if (start == goal) return 0;
+            if (start == goal)
+                return 0;
 
             var dist = new Dictionary<int, double>();
             var pq = new PriorityQueue<int, double>();
@@ -173,32 +219,159 @@ namespace ShopGuide.Api.Services
             dist[start] = 0;
             pq.Enqueue(start, 0);
 
-            while(pq.Count > 0)
+            while (pq.Count > 0)
             {
-                pq.TryDequeue(out int node, out double d);
+                pq.TryDequeue(out var node, out var d);
 
-                //Om vi redan hittat en bättre väg, hoppa
-                if(dist.TryGetValue(node, out var know) && d > know)
+                if (dist.TryGetValue(node, out var known) && d > known)
                     continue;
 
-                if(node == goal)
+                if (node == goal)
                     return d;
 
-                if(!graph.TryGetValue(node, out var neighbors))
+                if (!graph.TryGetValue(node, out var neighbors))
                     continue;
 
-                foreach (var(to, cost) in neighbors)
+                foreach (var (to, cost) in neighbors)
                 {
-                    var nd = d + cost;
+                    var newDistance = d + cost;
 
-                    if(!dist.TryGetValue(to, out var cur) || nd < cur)
+                    if (!dist.TryGetValue(to, out var currentDistance) || newDistance < currentDistance)
                     {
-                        dist[to] = nd;
-                        pq.Enqueue(to, nd);
+                        dist[to] = newDistance;
+                        pq.Enqueue(to, newDistance);
                     }
                 }
             }
-            return double.PositiveInfinity; //ingen väg
+
+            return double.PositiveInfinity;
+        }
+
+        private static int GetZone(StoreMapNode node)
+{
+    if (node.X < 300 && node.Y >= 300)
+        return 1;
+
+    if (node.X < 300 && node.Y < 300)
+        return 2;
+
+    if (node.X >= 300 && node.Y < 300)
+        return 3;
+
+    return 4;
+}
+
+private static List<int> BuildZoneBasedRoute(
+    Dictionary<int, List<(int to, double cost)>> graph,
+    List<StoreMapNode> allNodes,
+    int startNodeId,
+    HashSet<int> targets)
+{
+    var route = new List<int>();
+    var currentNodeId = startNodeId;
+
+    var targetNodes = allNodes
+        .Where(n => targets.Contains(n.Id))
+        .ToList();
+
+    var groupedByZone = targetNodes
+        .GroupBy(GetZone)
+        .OrderBy(g => g.Key);
+
+    foreach (var zoneGroup in groupedByZone)
+    {
+        var remainingInZone = zoneGroup
+            .Select(n => n.Id)
+            .ToHashSet();
+
+        while (remainingInZone.Count > 0)
+        {
+            int bestNode = -1;
+            double bestDistance = double.PositiveInfinity;
+
+            foreach (var candidate in remainingInZone)
+            {
+                var distance = DijkstraDistance(graph, currentNodeId, candidate);
+
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestNode = candidate;
+                }
+            }
+
+            if (bestNode == -1 || double.IsPositiveInfinity(bestDistance))
+                bestNode = remainingInZone.First();
+
+            route.Add(bestNode);
+            remainingInZone.Remove(bestNode);
+            currentNodeId = bestNode;
+        }
+    }
+
+    return route;
+}
+
+        private static List<int> DijkstraPath(
+            Dictionary<int, List<(int to, double cost)>> graph,
+            int start,
+            int goal)
+        {
+            if (start == goal)
+                return new List<int> { start };
+
+            var dist = new Dictionary<int, double>();
+            var previous = new Dictionary<int, int>();
+            var pq = new PriorityQueue<int, double>();
+
+            dist[start] = 0;
+            pq.Enqueue(start, 0);
+
+            while (pq.Count > 0)
+            {
+                pq.TryDequeue(out var node, out var d);
+
+                if (dist.TryGetValue(node, out var known) && d > known)
+                    continue;
+
+                if (node == goal)
+                    break;
+
+                if (!graph.TryGetValue(node, out var neighbors))
+                    continue;
+
+                foreach (var (to, cost) in neighbors)
+                {
+                    var newDistance = d + cost;
+
+                    if (!dist.TryGetValue(to, out var currentDistance) || newDistance < currentDistance)
+                    {
+                        dist[to] = newDistance;
+                        previous[to] = node;
+                        pq.Enqueue(to, newDistance);
+                    }
+                }
+            }
+
+            if (!dist.ContainsKey(goal))
+                return new List<int>();
+
+            var path = new List<int>();
+            var current = goal;
+
+            path.Add(current);
+
+            while (current != start)
+            {
+                if (!previous.TryGetValue(current, out var prev))
+                    return new List<int>();
+
+                current = prev;
+                path.Add(current);
+            }
+
+            path.Reverse();
+            return path;
         }
     }
 }

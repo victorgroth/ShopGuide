@@ -14,11 +14,13 @@ export default function RoutePage() {
     : params.storeId;
 
   const storeId = Number(rawStoreId);
+
   const storeName = Array.isArray(params.storeName)
     ? params.storeName[0]
     : (params.storeName as string) ?? "Butik";
 
   const mapImage = getStoreMapImage(storeName);
+
   const [map, setMap] = useState<StoreMap | null>(null);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -31,8 +33,17 @@ export default function RoutePage() {
     steps = [];
   }
 
-  const sortedSteps = [...steps].sort((a, b) => a.orderIndex - b.orderIndex);
+  let pathNodeIds: number[] = [];
 
+  try {
+    pathNodeIds = params.pathNodeIds
+      ? JSON.parse(params.pathNodeIds as string)
+      : [];
+  } catch {
+    pathNodeIds = [];
+  }
+
+  const sortedSteps = [...steps].sort((a, b) => a.orderIndex - b.orderIndex);
 
   useEffect(() => {
     async function loadMap() {
@@ -65,34 +76,41 @@ export default function RoutePage() {
       </Text>
 
       <Text style={{ fontSize: 18, marginBottom: 4 }}>{storeName}</Text>
+
       <Text style={{ marginBottom: 4, opacity: 0.7 }}>
         Butikens id: {rawStoreId}
       </Text>
-      <Text style={{ marginBottom: 16, opacity: 0.7 }}>
+
+      <Text style={{ marginBottom: 4, opacity: 0.7 }}>
         Antal stopp: {sortedSteps.length}
       </Text>
 
-    {mapLoading ? (
+      <Text style={{ marginBottom: 16, opacity: 0.7 }}>
+        Antal ruttnoder: {pathNodeIds.length}
+      </Text>
+
+      {mapLoading ? (
         <Text style={{ marginBottom: 16 }}>Laddar karta...</Text>
-    ) : mapError ? (
+      ) : mapError ? (
         <Text style={{ color: "red", marginBottom: 16 }}>
-            Fel: {mapError}
+          Fel: {mapError}
         </Text>
-    ) : !mapImage ? (
+      ) : !mapImage ? (
         <Text style={{ color: "red", marginBottom: 16 }}>
-            Ingen kartbild hittades för butiken.
+          Ingen kartbild hittades för butiken.
         </Text>
-    ) : !map ? (
+      ) : !map ? (
         <Text style={{ color: "red", marginBottom: 16 }}>
-            Ingen kartdata hämtades från backend.
+          Ingen kartdata hämtades från backend.
         </Text>
-    ) : (
+      ) : (
         <StoreMapView
-            steps={sortedSteps}
-            map={map}
-            image={mapImage}
+          steps={sortedSteps}
+          map={map}
+          image={mapImage}
+          pathNodeIds={pathNodeIds}
         />
-        )}
+      )}
 
       <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>
         Steg-för-steg

@@ -15,7 +15,9 @@ import {
   getShoppingList,
   addItemToShoppingList,
   planRoute,
+  getRoutePath,
   ShoppingListDto,
+  
 } from "../../src/api/shoppingLists";
 import { Product } from "../../src/types/product";
 
@@ -116,15 +118,16 @@ export default function StoreDetailsPage() {
       setShoppingList(updated);
 
       const routeSteps = updated.items
-  .sort((a, b) => (a.orderIndex ?? 999) - (b.orderIndex ?? 999))
-  .map((item, index) => ({
-    orderIndex: item.orderIndex ?? index + 1,
-    productId: item.productId,
-    productName: item.productName,
-    quantity: item.quantity,
-    nodeLabel: item.nodeLabel ?? "Okänd plats",
-    nodeId: item.nodeId,
-  }));
+      .sort((a, b) => (a.orderIndex ?? 999) - (b.orderIndex ?? 999))
+      .map((item, index) => ({
+        orderIndex: item.orderIndex ?? index + 1,
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        nodeLabel: item.nodeLabel ?? "Okänd plats",
+        nodeId: item.nodeId,
+      }));
+      const routePath = await getRoutePath(shoppingList.id);
 
       router.push({
         pathname: "/route/[storeId]",
@@ -132,6 +135,7 @@ export default function StoreDetailsPage() {
           storeId: storeId.toString(),
           storeName: name?.toString() ?? "Butik",
           steps: JSON.stringify(routeSteps),
+          pathNodeIds: JSON.stringify(routePath.pathNodeIds),
         },
       });
     } catch (err: any) {

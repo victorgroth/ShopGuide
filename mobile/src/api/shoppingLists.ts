@@ -97,3 +97,22 @@ export async function planRoute(shoppingListId: number) {
 
   return JSON.parse(text);
 }
+
+export type RoutePathDto = {
+  shoppingListId: number;
+  pathNodeIds: number[];
+};
+
+export async function getRoutePath(shoppingListId: number) {
+  const response = await fetch(
+    `${BASE_URL}/api/shoppinglists/${shoppingListId}/route-path`
+  );
+
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${text}`);
+  }
+
+  return JSON.parse(text) as RoutePathDto;
+}

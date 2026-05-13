@@ -1,0 +1,128 @@
+[
+  { "name": "Bananer 1kg", "category": "Frukt & Grönt", "brand": "ICA", "price": 24.90, "quantity": 80, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Fruktbord" },
+  { "name": "Äpplen Royal Gala 1kg", "category": "Frukt & Grönt", "brand": "ICA", "price": 29.90, "quantity": 70, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Fruktbord" },
+  { "name": "Apelsiner 1kg", "category": "Frukt & Grönt", "brand": "ICA", "price": 32.90, "quantity": 60, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Fruktbord" },
+  { "name": "Gurka", "category": "Frukt & Grönt", "brand": "ICA", "price": 14.90, "quantity": 90, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Grönsaksbord" },
+  { "name": "Tomater 500g", "category": "Frukt & Grönt", "brand": "ICA", "price": 24.90, "quantity": 55, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Grönsaksbord" },
+  { "name": "Paprika Mix 400g", "category": "Frukt & Grönt", "brand": "ICA", "price": 34.90, "quantity": 40, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Grönsaksbord" },
+  { "name": "Morötter 1kg", "category": "Frukt & Grönt", "brand": "ICA", "price": 18.90, "quantity": 100, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Rotfrukter" },
+  { "name": "Potatis Fast 2kg", "category": "Frukt & Grönt", "brand": "ICA", "price": 29.90, "quantity": 75, "nodeKey": "N48", "aisle": "Frukt & Grönt", "shelf": "Rotfrukter" },
+
+  { "name": "Formfranska", "category": "Bröd", "brand": "Pågen", "price": 24.90, "quantity": 35, "nodeKey": "N60", "aisle": "Bröd", "shelf": "Brödhylla" },
+  { "name": "Lingongrova", "category": "Bröd", "brand": "Pågen", "price": 32.90, "quantity": 30, "nodeKey": "N60", "aisle": "Bröd", "shelf": "Brödhylla" },
+  { "name": "Rågkaka", "category": "Bröd", "brand": "Polarbröd", "price": 29.90, "quantity": 28, "nodeKey": "N60", "aisle": "Bröd", "shelf": "Brödhylla" },
+  { "name": "Hamburgerbröd 8-pack", "category": "Bröd", "brand": "Korvbrödsbagarn", "price": 24.90, "quantity": 40, "nodeKey": "N60", "aisle": "Bröd", "shelf": "Brödhylla" },
+  { "name": "Kanelbullar 6-pack", "category": "Bageri", "brand": "ICA", "price": 39.90, "quantity": 22, "nodeKey": "N49", "aisle": "Bageri", "shelf": "Färskt bröd" },
+  { "name": "Croissanter 4-pack", "category": "Bageri", "brand": "ICA", "price": 34.90, "quantity": 20, "nodeKey": "N49", "aisle": "Bageri", "shelf": "Färskt bröd" },
+
+  { "name": "Kexchoklad 3-pack", "category": "Kex", "brand": "Cloetta", "price": 29.90, "quantity": 45, "nodeKey": "N61", "aisle": "Kex", "shelf": "Kexhylla" },
+  { "name": "Digestive Original", "category": "Kex", "brand": "McVitie's", "price": 24.90, "quantity": 38, "nodeKey": "N61", "aisle": "Kex", "shelf": "Kexhylla" },
+  { "name": "Ballerina Original", "category": "Kex", "brand": "Göteborgs Kex", "price": 23.90, "quantity": 42, "nodeKey": "N61", "aisle": "Kex", "shelf": "Kexhylla" },
+  { "name": "Mariekex", "category": "Kex", "brand": "Göteborgs Kex", "price": 19.90, "quantity": 35, "nodeKey": "N61", "aisle": "Kex", "shelf": "Kexhylla" },
+
+  { "name": "Kaffe Mellanrost 450g", "category": "Kaffe/Te", "brand": "Zoegas", "price": 59.90, "quantity": 32, "nodeKey": "N62", "aisle": "Kaffe/Te", "shelf": "Kaffehylla" },
+  { "name": "Kaffe Brygg 450g", "category": "Kaffe/Te", "brand": "Gevalia", "price": 54.90, "quantity": 35, "nodeKey": "N62", "aisle": "Kaffe/Te", "shelf": "Kaffehylla" },
+  { "name": "Snabbkaffe 200g", "category": "Kaffe/Te", "brand": "Nescafé", "price": 49.90, "quantity": 25, "nodeKey": "N62", "aisle": "Kaffe/Te", "shelf": "Kaffehylla" },
+  { "name": "Earl Grey Te 25-pack", "category": "Kaffe/Te", "brand": "Twinings", "price": 36.90, "quantity": 30, "nodeKey": "N62", "aisle": "Kaffe/Te", "shelf": "Tehylla" },
+  { "name": "Grönt Te 20-pack", "category": "Kaffe/Te", "brand": "Lipton", "price": 29.90, "quantity": 28, "nodeKey": "N62", "aisle": "Kaffe/Te", "shelf": "Tehylla" },
+
+  { "name": "Jordgubbssylt 400g", "category": "Sylt/Saft", "brand": "Bob", "price": 32.90, "quantity": 25, "nodeKey": "N63", "aisle": "Sylt/Saft", "shelf": "Sylthylla" },
+  { "name": "Hallonsylt 400g", "category": "Sylt/Saft", "brand": "Bob", "price": 34.90, "quantity": 22, "nodeKey": "N63", "aisle": "Sylt/Saft", "shelf": "Sylthylla" },
+  { "name": "Svartvinbärssaft 1L", "category": "Sylt/Saft", "brand": "Fun Light", "price": 29.90, "quantity": 30, "nodeKey": "N63", "aisle": "Sylt/Saft", "shelf": "Safthylla" },
+  { "name": "Apelsinmarmelad 400g", "category": "Sylt/Saft", "brand": "ICA", "price": 27.90, "quantity": 26, "nodeKey": "N63", "aisle": "Sylt/Saft", "shelf": "Sylthylla" },
+
+  { "name": "Chips Sourcream 275g", "category": "Snacks", "brand": "Estrella", "price": 32.90, "quantity": 50, "nodeKey": "N64", "aisle": "Snacks", "shelf": "Chipshylla" },
+  { "name": "Chips Dill 275g", "category": "Snacks", "brand": "OLW", "price": 32.90, "quantity": 50, "nodeKey": "N64", "aisle": "Snacks", "shelf": "Chipshylla" },
+  { "name": "Popcorn 3-pack", "category": "Snacks", "brand": "ICA", "price": 24.90, "quantity": 45, "nodeKey": "N64", "aisle": "Snacks", "shelf": "Snackshylla" },
+  { "name": "Salta Pinnar 250g", "category": "Snacks", "brand": "ICA", "price": 19.90, "quantity": 35, "nodeKey": "N64", "aisle": "Snacks", "shelf": "Snackshylla" },
+
+  { "name": "Coca-Cola 1.5L", "category": "Dryck", "brand": "Coca-Cola", "price": 24.90, "quantity": 60, "nodeKey": "N65", "aisle": "Dryck", "shelf": "Läskhylla" },
+  { "name": "Fanta Orange 1.5L", "category": "Dryck", "brand": "Fanta", "price": 22.90, "quantity": 55, "nodeKey": "N65", "aisle": "Dryck", "shelf": "Läskhylla" },
+  { "name": "Ramlösa Naturell 1.5L", "category": "Dryck", "brand": "Ramlösa", "price": 18.90, "quantity": 70, "nodeKey": "N65", "aisle": "Dryck", "shelf": "Vattenhylla" },
+  { "name": "Apelsinjuice 1L", "category": "Dryck", "brand": "Bravo", "price": 24.90, "quantity": 40, "nodeKey": "N65", "aisle": "Dryck", "shelf": "Juicehylla" },
+  { "name": "Äppeljuice 1L", "category": "Dryck", "brand": "Bravo", "price": 24.90, "quantity": 40, "nodeKey": "N65", "aisle": "Dryck", "shelf": "Juicehylla" },
+
+  { "name": "Toalettpapper 8-pack", "category": "Hushåll", "brand": "Lambi", "price": 59.90, "quantity": 35, "nodeKey": "N66", "aisle": "Hushåll", "shelf": "Papper" },
+  { "name": "Hushållspapper 4-pack", "category": "Hushåll", "brand": "Serla", "price": 49.90, "quantity": 30, "nodeKey": "N66", "aisle": "Hushåll", "shelf": "Papper" },
+  { "name": "Diskmedel 500ml", "category": "Hushåll", "brand": "Yes", "price": 29.90, "quantity": 40, "nodeKey": "N66", "aisle": "Hushåll", "shelf": "Disk" },
+  { "name": "Tvättmedel Color 1.5kg", "category": "Hushåll", "brand": "Via", "price": 69.90, "quantity": 25, "nodeKey": "N66", "aisle": "Hushåll", "shelf": "Tvätt" },
+
+  { "name": "Pasta Spaghetti 500g", "category": "Pasta", "brand": "Barilla", "price": 19.90, "quantity": 80, "nodeKey": "N67", "aisle": "Pasta", "shelf": "Pastahylla" },
+  { "name": "Pasta Penne 500g", "category": "Pasta", "brand": "Barilla", "price": 19.90, "quantity": 75, "nodeKey": "N67", "aisle": "Pasta", "shelf": "Pastahylla" },
+  { "name": "Lasagneplattor", "category": "Pasta", "brand": "Barilla", "price": 29.90, "quantity": 35, "nodeKey": "N67", "aisle": "Pasta", "shelf": "Pastahylla" },
+  { "name": "Fullkornspasta 500g", "category": "Pasta", "brand": "Kungsörnen", "price": 22.90, "quantity": 40, "nodeKey": "N67", "aisle": "Pasta", "shelf": "Pastahylla" },
+
+  { "name": "Jasminris 1kg", "category": "Ris/Gryn", "brand": "Uncle Ben's", "price": 34.90, "quantity": 45, "nodeKey": "N68", "aisle": "Ris/Gryn", "shelf": "Ris" },
+  { "name": "Basmatiris 1kg", "category": "Ris/Gryn", "brand": "ICA", "price": 32.90, "quantity": 45, "nodeKey": "N68", "aisle": "Ris/Gryn", "shelf": "Ris" },
+  { "name": "Havregryn 1kg", "category": "Ris/Gryn", "brand": "AXA", "price": 19.90, "quantity": 65, "nodeKey": "N68", "aisle": "Ris/Gryn", "shelf": "Gryn" },
+  { "name": "Couscous 500g", "category": "Ris/Gryn", "brand": "ICA", "price": 24.90, "quantity": 38, "nodeKey": "N68", "aisle": "Ris/Gryn", "shelf": "Gryn" },
+
+  { "name": "Krossade tomater 400g", "category": "Konserver", "brand": "Mutti", "price": 16.90, "quantity": 90, "nodeKey": "N69", "aisle": "Konserver", "shelf": "Tomatkonserver" },
+  { "name": "Majs 340g", "category": "Konserver", "brand": "Green Giant", "price": 18.90, "quantity": 70, "nodeKey": "N69", "aisle": "Konserver", "shelf": "Grönsakskonserver" },
+  { "name": "Tonfisk i vatten", "category": "Konserver", "brand": "Abba", "price": 24.90, "quantity": 50, "nodeKey": "N69", "aisle": "Konserver", "shelf": "Fiskkonserver" },
+  { "name": "Kikärtor 380g", "category": "Konserver", "brand": "Zeta", "price": 17.90, "quantity": 55, "nodeKey": "N69", "aisle": "Konserver", "shelf": "Baljväxter" },
+
+  { "name": "Ketchup 1kg", "category": "Såser", "brand": "Felix", "price": 32.90, "quantity": 45, "nodeKey": "N70", "aisle": "Såser", "shelf": "Såshylla" },
+  { "name": "Bearnaisesås 3-pack", "category": "Såser", "brand": "Blå Band", "price": 24.90, "quantity": 35, "nodeKey": "N70", "aisle": "Såser", "shelf": "Såshylla" },
+  { "name": "Tacossås Medium", "category": "Såser", "brand": "Santa Maria", "price": 24.90, "quantity": 40, "nodeKey": "N70", "aisle": "Såser", "shelf": "Texmex" },
+  { "name": "Sojasås 150ml", "category": "Såser", "brand": "Kikkoman", "price": 29.90, "quantity": 30, "nodeKey": "N70", "aisle": "Såser", "shelf": "Asiatiskt" },
+
+  { "name": "Salt 1kg", "category": "Kryddor", "brand": "Jozo", "price": 14.90, "quantity": 70, "nodeKey": "N71", "aisle": "Kryddor", "shelf": "Kryddhylla" },
+  { "name": "Svartpeppar Mald", "category": "Kryddor", "brand": "Santa Maria", "price": 29.90, "quantity": 40, "nodeKey": "N71", "aisle": "Kryddor", "shelf": "Kryddhylla" },
+  { "name": "Paprikapulver", "category": "Kryddor", "brand": "Santa Maria", "price": 24.90, "quantity": 35, "nodeKey": "N71", "aisle": "Kryddor", "shelf": "Kryddhylla" },
+  { "name": "Oregano", "category": "Kryddor", "brand": "Santa Maria", "price": 24.90, "quantity": 35, "nodeKey": "N71", "aisle": "Kryddor", "shelf": "Kryddhylla" },
+
+  { "name": "Vetemjöl 2kg", "category": "Bakning", "brand": "Kungsörnen", "price": 24.90, "quantity": 55, "nodeKey": "N72", "aisle": "Bakning", "shelf": "Mjöl" },
+  { "name": "Strösocker 2kg", "category": "Bakning", "brand": "Dansukker", "price": 29.90, "quantity": 50, "nodeKey": "N72", "aisle": "Bakning", "shelf": "Socker" },
+  { "name": "Bakpulver", "category": "Bakning", "brand": "Dr. Oetker", "price": 14.90, "quantity": 40, "nodeKey": "N72", "aisle": "Bakning", "shelf": "Bakingredienser" },
+  { "name": "Vaniljsocker", "category": "Bakning", "brand": "Dansukker", "price": 19.90, "quantity": 35, "nodeKey": "N72", "aisle": "Bakning", "shelf": "Bakingredienser" },
+
+  { "name": "Nudlar Kyckling", "category": "Soppor", "brand": "Nissin", "price": 9.90, "quantity": 80, "nodeKey": "N73", "aisle": "Soppor", "shelf": "Snabbmat" },
+  { "name": "Tomatsoppa 500ml", "category": "Soppor", "brand": "Kelda", "price": 24.90, "quantity": 40, "nodeKey": "N73", "aisle": "Soppor", "shelf": "Soppor" },
+  { "name": "Ärtsoppa 500g", "category": "Soppor", "brand": "Felix", "price": 19.90, "quantity": 35, "nodeKey": "N73", "aisle": "Soppor", "shelf": "Soppor" },
+
+  { "name": "Cornflakes 500g", "category": "Frukost", "brand": "Kellogg's", "price": 39.90, "quantity": 35, "nodeKey": "N40", "aisle": "Frukost", "shelf": "Flingor" },
+  { "name": "Granola Naturell", "category": "Frukost", "brand": "Paulúns", "price": 49.90, "quantity": 28, "nodeKey": "N40", "aisle": "Frukost", "shelf": "Flingor" },
+  { "name": "Müsli Frukt", "category": "Frukost", "brand": "AXA", "price": 34.90, "quantity": 32, "nodeKey": "N40", "aisle": "Frukost", "shelf": "Flingor" },
+
+  { "name": "Barnmat Lasagne 6 mån", "category": "Barnmat", "brand": "Semper", "price": 17.90, "quantity": 45, "nodeKey": "N41", "aisle": "Barnmat", "shelf": "Barnmat" },
+  { "name": "Barnmat Fruktpuré", "category": "Barnmat", "brand": "Nestlé", "price": 14.90, "quantity": 50, "nodeKey": "N41", "aisle": "Barnmat", "shelf": "Barnmat" },
+  { "name": "Välling Mild 700g", "category": "Barnmat", "brand": "Semper", "price": 89.90, "quantity": 25, "nodeKey": "N41", "aisle": "Barnmat", "shelf": "Välling" },
+
+  { "name": "Hundmat Torrfoder 2kg", "category": "Djurmat", "brand": "Pedigree", "price": 99.90, "quantity": 25, "nodeKey": "N42", "aisle": "Djurmat", "shelf": "Hundmat" },
+  { "name": "Kattmat Torrfoder 1.5kg", "category": "Djurmat", "brand": "Whiskas", "price": 79.90, "quantity": 30, "nodeKey": "N42", "aisle": "Djurmat", "shelf": "Kattmat" },
+  { "name": "Kattmat Portionspåsar 12-pack", "category": "Djurmat", "brand": "Felix", "price": 64.90, "quantity": 22, "nodeKey": "N42", "aisle": "Djurmat", "shelf": "Kattmat" },
+
+  { "name": "Lösgodis 1kg", "category": "Godis", "brand": "ICA", "price": 89.90, "quantity": 40, "nodeKey": "N43", "aisle": "Godis", "shelf": "Godishylla" },
+  { "name": "Mjölkchoklad 200g", "category": "Godis", "brand": "Marabou", "price": 29.90, "quantity": 55, "nodeKey": "N43", "aisle": "Godis", "shelf": "Choklad" },
+  { "name": "Ahlgrens Bilar", "category": "Godis", "brand": "Ahlgrens", "price": 24.90, "quantity": 45, "nodeKey": "N43", "aisle": "Godis", "shelf": "Påsgodis" },
+  { "name": "Daim 2-pack", "category": "Godis", "brand": "Marabou", "price": 17.90, "quantity": 50, "nodeKey": "N43", "aisle": "Godis", "shelf": "Choklad" },
+
+  { "name": "Chips Grill 275g", "category": "Chips", "brand": "Estrella", "price": 32.90, "quantity": 45, "nodeKey": "N44", "aisle": "Chips", "shelf": "Chipshylla" },
+  { "name": "Ostbågar 275g", "category": "Chips", "brand": "OLW", "price": 31.90, "quantity": 50, "nodeKey": "N44", "aisle": "Chips", "shelf": "Snackshylla" },
+
+  { "name": "Vaniljglass 1.5L", "category": "Glass", "brand": "GB", "price": 49.90, "quantity": 25, "nodeKey": "N45", "aisle": "Glass", "shelf": "Frysbox" },
+  { "name": "Piggelin 15-pack", "category": "Glass", "brand": "GB", "price": 54.90, "quantity": 20, "nodeKey": "N45", "aisle": "Glass", "shelf": "Frysbox" },
+  { "name": "Magnum Mandel 4-pack", "category": "Glass", "brand": "GB", "price": 59.90, "quantity": 18, "nodeKey": "N45", "aisle": "Glass", "shelf": "Frysbox" },
+
+  { "name": "Frysta köttbullar 1kg", "category": "Frost", "brand": "Findus", "price": 69.90, "quantity": 30, "nodeKey": "N46", "aisle": "Frost", "shelf": "Frys" },
+  { "name": "Fryst pizza Vesuvio", "category": "Frost", "brand": "Grandiosa", "price": 39.90, "quantity": 35, "nodeKey": "N46", "aisle": "Frost", "shelf": "Frys" },
+  { "name": "Frysta blåbär 500g", "category": "Frost", "brand": "ICA", "price": 34.90, "quantity": 28, "nodeKey": "N46", "aisle": "Frost", "shelf": "Frys" },
+
+  { "name": "Mjölk 1L", "category": "Mejeri", "brand": "Arla", "price": 16.90, "quantity": 80, "nodeKey": "N50", "aisle": "Mejeri", "shelf": "Kyldisk" },
+  { "name": "Lättmjölk 1L", "category": "Mejeri", "brand": "Arla", "price": 15.90, "quantity": 70, "nodeKey": "N50", "aisle": "Mejeri", "shelf": "Kyldisk" },
+  { "name": "Smör 500g", "category": "Mejeri", "brand": "Arla", "price": 34.90, "quantity": 45, "nodeKey": "N50", "aisle": "Mejeri", "shelf": "Kyldisk" },
+  { "name": "Yoghurt Naturell 1L", "category": "Mejeri", "brand": "Arla", "price": 27.90, "quantity": 40, "nodeKey": "N50", "aisle": "Mejeri", "shelf": "Kyldisk" },
+  { "name": "Ost Präst 700g", "category": "Mejeri", "brand": "Arla", "price": 89.90, "quantity": 28, "nodeKey": "N50", "aisle": "Mejeri", "shelf": "Ost" },
+
+  { "name": "Räksallad 200g", "category": "Delikatess", "brand": "ICA", "price": 39.90, "quantity": 20, "nodeKey": "N52", "aisle": "Delikatess", "shelf": "Delidisk" },
+  { "name": "Potatissallad 400g", "category": "Delikatess", "brand": "Rydbergs", "price": 34.90, "quantity": 25, "nodeKey": "N52", "aisle": "Delikatess", "shelf": "Delidisk" },
+  { "name": "Skagenröra 200g", "category": "Delikatess", "brand": "ICA", "price": 44.90, "quantity": 20, "nodeKey": "N52", "aisle": "Delikatess", "shelf": "Delidisk" },
+
+  { "name": "Tulpanbukett", "category": "Blommor", "brand": "ICA", "price": 79.90, "quantity": 15, "nodeKey": "N51", "aisle": "Blommor", "shelf": "Blomsterbord" },
+  { "name": "Rosor 10-pack", "category": "Blommor", "brand": "ICA", "price": 99.90, "quantity": 12, "nodeKey": "N51", "aisle": "Blommor", "shelf": "Blomsterbord" },
+
+  { "name": "Frysta grönsaker 500g", "category": "Frysvaror", "brand": "Findus", "price": 29.90, "quantity": 35, "nodeKey": "N53", "aisle": "Frysvaror", "shelf": "Frys" },
+  { "name": "Pommes Frites 1kg", "category": "Frysvaror", "brand": "Felix", "price": 34.90, "quantity": 40, "nodeKey": "N53", "aisle": "Frysvaror", "shelf": "Frys" },
+  { "name": "Kycklingfilé Fryst 1kg", "category": "Frysvaror", "brand": "Kronfågel", "price": 119.90, "quantity": 25, "nodeKey": "N53", "aisle": "Frysvaror", "shelf": "Frys" }
+]
