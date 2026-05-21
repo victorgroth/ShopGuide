@@ -12,4 +12,6 @@ public class SeedProductData
     public string NodeKey { get; set; } = "";
     public string Aisle { get; set; } = "";
     public string Shelf { get; set; } = "";
+    public string? Description { get; set; }
+    public string? SearchKeywords { get; set; }
 }

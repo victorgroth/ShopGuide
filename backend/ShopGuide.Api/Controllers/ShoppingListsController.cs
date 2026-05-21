@@ -5,7 +5,6 @@ using ShopGuide.Api.DTOs;
 using ShopGuide.Api.Models;
 using ShopGuide.Api.Services;
 
-
 namespace ShopGuide.Api.Controllers
 {
     [ApiController]
@@ -51,6 +50,20 @@ namespace ShopGuide.Api.Controllers
 
             return CreatedAtAction(nameof(GetShoppingList), new { id = list.Id }, dto);
         }
+
+        [HttpGet("{id:int}/route-plan")]
+public async Task<ActionResult<RoutePlanDto>> GetRoutePlan(int id)
+{
+    try
+    {
+        var routePlan = await _routePlanner.BuildRoutePlanAsync(id);
+        return Ok(routePlan);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return NotFound(ex.Message);
+    }
+}
 
         // GET: api/shoppinglists/{id}
         [HttpGet("{id:int}")]
@@ -179,6 +192,22 @@ public async Task<IActionResult> GetRoutePath(int id)
     {
         return NotFound(ex.Message);
     }
+}
+
+[HttpDelete("items/{itemId}")]
+public async Task<IActionResult> RemoveItem(int itemId)
+{
+    var item = await _context.ShoppingListItems
+        .FirstOrDefaultAsync(x => x.Id == itemId);
+
+    if (item == null)
+        return NotFound();
+
+    _context.ShoppingListItems.Remove(item);
+
+    await _context.SaveChangesAsync();
+
+    return NoContent();
 }
     }
 }

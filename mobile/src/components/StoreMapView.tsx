@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Text, View } from "react-native";
-import Svg, { Circle, Line, Rect, Text as SvgText } from "react-native-svg";
+import Svg, { Circle, Line, Text as SvgText } from "react-native-svg";
 import { StoreMap } from "../api/storeMap";
 import { RouteStep } from "../types/route";
 
@@ -31,11 +31,7 @@ export default function StoreMapView({
   const scaleY = (y: number) => (y / imageHeight) * height;
 
   function getNode(nodeId: number) {
-    return map?.nodes.find((node) => node.id === nodeId);
-  }
-
-  function getStepForNode(nodeId: number) {
-    return steps.find((step) => step.nodeId === nodeId);
+    return map!.nodes.find((node) => node.id === nodeId);
   }
 
   return (
@@ -46,9 +42,10 @@ export default function StoreMapView({
         alignSelf: "center",
         marginBottom: 20,
         borderWidth: 1,
-        borderRadius: 12,
+        borderColor: "#e5e7eb",
+        borderRadius: 16,
         overflow: "hidden",
-        backgroundColor: "#fff",
+        backgroundColor: "#f8fafc",
       }}
     >
       <Image
@@ -57,88 +54,12 @@ export default function StoreMapView({
           width,
           height,
           position: "absolute",
+          opacity: 0.72,
         }}
         resizeMode="stretch"
       />
 
-      
-
       <Svg width={width} height={height}>
-
-        {/* Debug: zoner */}
-<Rect
-  x={scaleX(0)}
-  y={scaleY(300)}
-  width={scaleX(300)}
-  height={scaleY(460)}
-  fill="green"
-  opacity={0.15}
-/>
-
-<Rect
-  x={scaleX(0)}
-  y={scaleY(0)}
-  width={scaleX(300)}
-  height={scaleY(300)}
-  fill="yellow"
-  opacity={0.18}
-/>
-
-<Rect
-  x={scaleX(300)}
-  y={scaleY(0)}
-  width={scaleX(300)}
-  height={scaleY(300)}
-  fill="blue"
-  opacity={0.14}
-/>
-
-<Rect
-  x={scaleX(300)}
-  y={scaleY(300)}
-  width={scaleX(500)}
-  height={scaleY(460)}
-  fill="red"
-  opacity={0.13}
-/>
-
-<SvgText x={scaleX(120)} y={scaleY(450)} fontSize="12" fill="#111" fontWeight="bold">
-  ZON 1
-</SvgText>
-
-<SvgText x={scaleX(120)} y={scaleY(150)} fontSize="12" fill="#111" fontWeight="bold">
-  ZON 2
-</SvgText>
-
-<SvgText x={scaleX(420)} y={scaleY(150)} fontSize="12" fill="#111" fontWeight="bold">
-  ZON 3
-</SvgText>
-
-<SvgText x={scaleX(420)} y={scaleY(450)} fontSize="12" fill="#111" fontWeight="bold">
-  ZON 4
-</SvgText>
-        {/* Vanliga gångar/edges */}
-        {map.edges.map((edge, index) => {
-          const from = getNode(edge.fromNodeId);
-          const to = getNode(edge.toNodeId);
-
-          if (!from || !to) return null;
-
-          return (
-            <Line
-              key={`edge-${index}`}
-              x1={scaleX(from.x)}
-              y1={scaleY(from.y)}
-              x2={scaleX(to.x)}
-              y2={scaleY(to.y)}
-              stroke="#2563eb"
-              strokeWidth={1.5}
-              opacity={0.35}
-            />
-          );
-        })}
-
-        {/* Planerad rutt som följer route-path från backend */}
         {pathNodeIds.map((nodeId, index) => {
           if (index === pathNodeIds.length - 1) return null;
 
@@ -149,54 +70,60 @@ export default function StoreMapView({
 
           return (
             <Line
-              key={`route-path-${index}`}
+              key={`route-${index}`}
               x1={scaleX(from.x)}
               y1={scaleY(from.y)}
               x2={scaleX(to.x)}
               y2={scaleY(to.y)}
-              stroke="#22c55e"
-              strokeWidth={4}
+              stroke="#6ea36f"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeDasharray="7 5"
               opacity={0.95}
             />
           );
         })}
 
-        {/* Alla nodes i debugläge */}
-        {map.nodes.map((node) => {
-          const step = getStepForNode(node.id);
+        {steps.map((step) => {
+          if (!step.nodeId) return null;
+
+          const node = getNode(step.nodeId);
+          if (!node) return null;
+
+          const x = scaleX(node.x);
+          const y = scaleY(node.y);
 
           return (
-            <React.Fragment key={node.id}>
+            <React.Fragment key={`step-${step.orderIndex}-${step.nodeId}`}>
               <Circle
-                cx={scaleX(node.x)}
-                cy={scaleY(node.y)}
-                r={step ? 6 : 3.5}
-                fill={step ? "#f97316" : "#ef4444"}
-                stroke="#111827"
-                strokeWidth={1}
+                cx={x}
+                cy={y}
+                r={9}
+                fill="#f97316"
+                stroke="#ffffff"
+                strokeWidth={2}
               />
 
-              {step ? (
-                <SvgText
-                  x={scaleX(node.x)}
-                  y={scaleY(node.y) + 3}
-                  fontSize="7"
-                  fontWeight="bold"
-                  fill="#ffffff"
-                  textAnchor="middle"
-                >
-                  {step.orderIndex}
-                </SvgText>
-              ) : (
-                <SvgText
-                  x={scaleX(node.x) + 5}
-                  y={scaleY(node.y) + 3}
-                  fontSize="6"
-                  fill="#111827"
-                >
-                  {node.id}
-                </SvgText>
-              )}
+              <Circle
+                cx={x}
+                cy={y}
+                r={9}
+                fill="none"
+                stroke="#c2410c"
+                strokeWidth={1}
+                opacity={0.85}
+              />
+
+              <SvgText
+                x={x}
+                y={y + 3}
+                fontSize="8"
+                fontWeight="bold"
+                fill="#ffffff"
+                textAnchor="middle"
+              >
+                {step.orderIndex}
+              </SvgText>
             </React.Fragment>
           );
         })}

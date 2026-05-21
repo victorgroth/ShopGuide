@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ShopGuide.Api.Data;
 using ShopGuide.Api.Models;
+using ShopGuide.Api.DTOs;
 
 namespace ShopGuide.Api.Services
 {
@@ -373,5 +374,89 @@ private static List<int> BuildZoneBasedRoute(
             path.Reverse();
             return path;
         }
+
+        public async Task<RoutePlanDto> BuildRoutePlanAsync(int shoppingListId)
+{
+    var fullPath = await BuildRoutePathAsync(shoppingListId);
+    var segments = await BuildRouteSegmentsAsync(shoppingListId);
+
+    return new RoutePlanDto
+    {
+        ShoppingListId = shoppingListId,
+        FullPathNodeIds = fullPath,
+        Segments = segments
+    };
+}
+
+public async Task<List<RouteSegmentDto>> BuildRouteSegmentsAsync(int shoppingListId)
+{
+    var list = await _context.ShoppingLists
+        .FirstOrDefaultAsync(x => x.Id == shoppingListId);
+
+    if (list == null)
+        throw new InvalidOperationException($"ShoppingList {shoppingListId} not found.");
+
+    var nodes = await _context.StoreMapNodes
+        .Where(n => n.StoreId == list.StoreId)
+        .ToListAsync();
+
+    var edges = await _context.StoreMapEdges
+        .Where(e => e.StoreId == list.StoreId)
+        .ToListAsync();
+
+    var graph = BuildGraph(edges);
+
+    var entranceNode = nodes.FirstOrDefault(n => n.NodeType == "Entrance") ?? nodes.First();
+    var checkoutNode = nodes.FirstOrDefault(n => n.NodeType == "Checkout");
+
+    var items = await _context.ShoppingListItems
+    .Include(i => i.Product)
+    .Where(i => i.ShoppingListId == shoppingListId && i.NodeId.HasValue)
+    .OrderBy(i => i.OrderIndex)
+    .ToListAsync();
+
+    var segments = new List<RouteSegmentDto>();
+
+    var currentNodeId = entranceNode.Id;
+    var step = 1;
+
+    foreach (var item in items)
+    {
+        var targetNodeId = item.NodeId!.Value;
+        var path = DijkstraPath(graph, currentNodeId, targetNodeId);
+
+        segments.Add(new RouteSegmentDto
+        {
+            StepNumber = step,
+            Title = $"Gå till {item.Product.Name}",
+            ProductName = item.Product.Name,
+            ProductId = item.ProductId,
+            FromNodeId = currentNodeId,
+            ToNodeId = targetNodeId,
+            PathNodeIds = path
+        });
+
+        currentNodeId = targetNodeId;
+        step++;
+    }
+
+    if (checkoutNode != null)
+    {
+        var checkoutPath = DijkstraPath(graph, currentNodeId, checkoutNode.Id);
+
+        segments.Add(new RouteSegmentDto
+        {
+            StepNumber = step,
+            Title = "Gå till kassan",
+            ProductName = null,
+            ProductId = null,
+            FromNodeId = currentNodeId,
+            ToNodeId = checkoutNode.Id,
+            PathNodeIds = checkoutPath
+        });
+    }
+
+    return segments;
+}
     }
 }

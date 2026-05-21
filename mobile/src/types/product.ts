@@ -9,4 +9,6 @@ export type Product = {
   shelf?: string;
   nodeId?: number | null;
   nodeLabel?: string | null;
+  description?: string;
+  searchKeywords?: string;
 };

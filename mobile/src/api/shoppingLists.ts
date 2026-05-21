@@ -116,3 +116,46 @@ export async function getRoutePath(shoppingListId: number) {
 
   return JSON.parse(text) as RoutePathDto;
 }
+export type RouteSegmentDto = {
+  stepNumber: number;
+  title: string;
+  productName?: string | null;
+  productId?: number | null;
+  fromNodeId: number;
+  toNodeId: number;
+  pathNodeIds: number[];
+};
+
+export type RoutePlanDto = {
+  shoppingListId: number;
+  fullPathNodeIds: number[];
+  segments: RouteSegmentDto[];
+};
+
+export async function getRoutePlan(shoppingListId: number) {
+  const response = await fetch(
+    `${BASE_URL}/api/shoppinglists/${shoppingListId}/route-plan`
+  );
+
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${text}`);
+  }
+
+  return JSON.parse(text) as RoutePlanDto;
+}
+
+export async function removeShoppingListItem(itemId: number) {
+  const response = await fetch(
+    `${BASE_URL}/api/shoppinglists/items/${itemId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Kunde inte ta bort produkt");
+  }
+}
+

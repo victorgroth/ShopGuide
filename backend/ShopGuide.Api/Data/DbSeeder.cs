@@ -141,7 +141,9 @@ foreach (var item in icaProducts)
     {
         Name = item.Name,
         Category = item.Category,
-        Brand = item.Brand
+        Brand = item.Brand,
+        Description = item.Description,
+        SearchKeywords = item.SearchKeywords,
     };
 
     context.Products.Add(product);

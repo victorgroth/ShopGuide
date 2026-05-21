@@ -1,55 +1,54 @@
 import { Pressable, Text, View } from "react-native";
 import { Product } from "../types/product";
 
-type ProductCardProps = {
+type Props = {
   product: Product;
-  onAddToList?: () => void;
+  onAddToList: () => void;
 };
 
-export default function ProductCard({ product, onAddToList }: ProductCardProps) {
+export default function ProductCard({ product, onAddToList }: Props) {
   return (
     <View
       style={{
+        backgroundColor: "white",
+        borderRadius: 16,
         padding: 14,
-        borderWidth: 1,
-        borderRadius: 10,
         marginBottom: 10,
+        borderWidth: 1,
+        borderColor: "#e5e7eb",
       }}
     >
-      <Text style={{ fontSize: 18, fontWeight: "600" }}>{product.name}</Text>
-      <Text>{product.brand}</Text>
-      <Text style={{ opacity: 0.7 }}>{product.category}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 17, fontWeight: "800", marginBottom: 4 }}>
+            {product.name}
+          </Text>
 
-      {product.price !== undefined && (
-        <Text style={{ marginTop: 6 }}>Pris: {product.price} kr</Text>
-      )}
+          <Text style={{ color: "#6b7280", marginBottom: 4 }}>
+            {product.category}
+          </Text>
 
-      {product.quantity !== undefined && (
-        <Text>Lager: {product.quantity}</Text>
-      )}
+          {product.brand && (
+            <Text style={{ color: "#6b7280" }}>{product.brand}</Text>
+          )}
+        </View>
 
-      {product.aisle && (
-        <Text>
-          Plats: {product.aisle}
-          {product.shelf ? `, ${product.shelf}` : ""}
-        </Text>
-      )}
-
-      <Pressable
-        onPress={onAddToList}
-        style={{
-          marginTop: 10,
-          backgroundColor: "#222",
-          paddingVertical: 10,
-          paddingHorizontal: 12,
-          borderRadius: 8,
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "white", fontWeight: "600" }}>
-          Lägg till i inköpslista
-        </Text>
-      </Pressable>
+        <Pressable
+          onPress={onAddToList}
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            backgroundColor: "#16a34a",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 24, fontWeight: "800" }}>
+            +
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
